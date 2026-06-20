@@ -13,27 +13,32 @@
     "onStartupFinished"
   ],
   "main": "./extension.js",
+  "files": [
+    "extension.js",
+    "webview.html",
+    "webview.css"
+  ],
   "contributes": {
     "commands": [
       {
-        "command": "siptracker.helloWorld",
-        "title": "Hello World"
-      },
-      {
         "command": "siptracker.stop",
-        "title": "Stop Timer"
+        "title": "Sip Tracker: Stop Timer"
       },
       {
         "command": "siptracker.reset",
-        "title": "Reset Timer"
+        "title": "Sip Tracker: Reset Timer"
       },
       {
         "command": "siptracker.start",
-        "title": "Start Timer"
+        "title": "Sip Tracker: Start Timer"
       },
       {
         "command": "siptracker.showStats",
-        "title": "Show Stats"
+        "title": "Sip Tracker: Show Stats"
+      },
+      {
+        "command": "siptracker.showAchievements",
+        "title": "Sip Tracker: Show Achievements"
       }
     ],
     "configuration": {
@@ -45,9 +50,9 @@
           "min": 0,
           "description": "How often to remind you to drink water (in minutes)"
         },
-        "siptracker.sipMsg" :{
-          "type" : "string",
-          "default" : "Time For a Sip!!",
+        "siptracker.sipMsg": {
+          "type": "string",
+          "default": "Time For a Sip!!",
           "description": "Set your own reminder message"
         }
       }

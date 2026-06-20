@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sip Tracker</title>
+  <link rel="stylesheet" href="{{CSS_URI}}"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-row">
+      <span class="motif motif-drop" aria-hidden="true"></span>
+      <h1>Sip Tracker</h1>
+    </div>
+    <p class="header-sub">Daily Hydration Log</p>
+  </div>
+
+  <!-- TOOLBAR: pause / resume / set interval -->
+  <div class="toolbar">
+    <button class="toolbar-btn" id="pause-btn" data-action="pause">
+      <span class="toolbar-icon" aria-hidden="true">
+        <svg width="11" height="11" viewBox="0 0 11 11"><rect x="1" y="0" width="3" height="11" fill="currentColor"/><rect x="7" y="0" width="3" height="11" fill="currentColor"/></svg>
+      </span>
+      <span>Pause</span>
+    </button>
+    <span class="toolbar-divider"></span>
+    <button class="toolbar-btn" id="resume-btn" data-action="resume">
+      <span class="toolbar-icon" aria-hidden="true">
+        <svg width="10" height="11" viewBox="0 0 10 11"><polygon points="0,0 10,5.5 0,11" fill="currentColor"/></svg>
+      </span>
+      <span>Resume</span>
+    </button>
+    <span class="toolbar-divider"></span>
+    <button class="toolbar-btn" id="set-btn" data-action="set">
+      <span class="toolbar-icon" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 12 12">
+          <circle cx="6" cy="6" r="1.6" fill="currentColor"/>
+          <path d="M6 0.6v1.8M6 9.6v1.8M0.6 6h1.8M9.6 6h1.8M1.9 1.9l1.3 1.3M8.8 8.8l1.3 1.3M1.9 10.1l1.3-1.3M8.8 3.2l1.3-1.3"
+                stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="square"/>
+        </svg>
+      </span>
+      <span>Set</span>
+    </button>
+  </div>
+
+  <!-- STATS ROW: 3 compact cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="corner-motif motif-drop" aria-hidden="true"></span>
+      <span class="stat-value" id="sip-count">0</span>
+      <span class="stat-label">Sips Today</span>
+    </div>
+    <div class="stat-card">
+      <span class="corner-motif motif-flame" aria-hidden="true"></span>
+      <span class="stat-value" id="streak">0</span>
+      <span class="stat-label">Day Streak</span>
+    </div>
+    <div class="stat-card">
+      <span class="corner-motif motif-star" aria-hidden="true"></span>
+      <span class="stat-value" id="xp-percent">0<span class="stat-unit">%</span></span>
+      <span class="stat-label">To Next Level</span>
+    </div>
+  </div>
+
+  <div class="divider"><span></span><span></span><span></span></div>
+
+  <!-- XP HERO SECTION -->
+  <div class="card card-hero">
+    <div class="hero-head">
+      <span class="hero-level">Level <span id="xp-level">1</span></span>
+      <span class="hero-xp"><span id="xp-current">0</span> / <span id="xp-next">50</span> XP</span>
+    </div>
+    <div class="segment-bar" id="segment-bar" aria-hidden="true">
+      <!-- 20 segments injected by JS -->
+    </div>
+    <p class="hero-caption" id="hero-caption">Keep sipping to reach Level 2</p>
+  </div>
+
+  <div class="divider"><span></span><span></span><span></span></div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Achievements</span>
+      <span class="card-meta" id="achievement-count">0 / 0 unlocked</span>
+    </div>
+    <div id="achievements-list" class="achievement-grid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <button class="btn-secondary" id="show-all-btn">View all achievements</button>
+
+  <script>
+    window.addEventListener('message', (event) => {
+      const { command, data } = event.data;
+      if (command === 'updateStats') updateUI(data);
+    });
+
+    function buildSegments(count) {
+      const bar = document.getElementById('segment-bar');
+      bar.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const seg = document.createElement('span');
+        seg.className = 'segment';
+        bar.appendChild(seg);
+      }
+    }
+
+    const SEGMENT_COUNT = 20;
+    buildSegments(SEGMENT_COUNT);
+
+    function updateUI(data) {
+      document.getElementById('sip-count').textContent  = data.sipCount ?? 0;
+      document.getElementById('streak').textContent     = data.streak ?? 0;
+      document.getElementById('xp-percent').textContent = '';
+      document.getElementById('xp-percent').innerHTML   = (data.progress ?? 0) + '<span class="stat-unit">%</span>';
+      document.getElementById('xp-level').textContent   = data.level ?? 1;
+      document.getElementById('xp-current').textContent = data.xp ?? 0;
+      document.getElementById('xp-next').textContent    = data.nextLevelXp ?? 50;
+      document.getElementById('hero-caption').textContent =
+        `Keep sipping to reach Level ${(data.level ?? 1) + 1}`;
+
+      // fill segments proportionally
+      const filled = Math.round(((data.progress ?? 0) / 100) * SEGMENT_COUNT);
+      document.querySelectorAll('.segment').forEach((seg, i) => {
+        seg.classList.toggle('filled', i < filled);
+      });
+
+      if (data.achievements) {
+        renderAchievements(data.achievements, data.unlocked, data.showAll);
+      }
+
+      if (typeof data.isRunning === 'boolean') {
+        updateToolbarState(data.isRunning);
+      }
+    }
+
+    function renderAchievements(achievements, unlocked, showAll) {
+      const list = document.getElementById('achievements-list');
+      const unlockedSet = new Set(unlocked);
+
+      document.getElementById('achievement-count').textContent =
+        `${unlockedSet.size} / ${achievements.length} unlocked`;
+
+      const unlockedItems = achievements.filter(a => unlockedSet.has(a.id));
+      const lockedItems   = achievements.filter(a => !unlockedSet.has(a.id));
+      const toShow = showAll
+        ? [...unlockedItems, ...lockedItems]
+        : [...unlockedItems, ...lockedItems.slice(0, 3)];
+
+      list.innerHTML = toShow.map(a => {
+        const isUnlocked = unlockedSet.has(a.id);
+        return `
+          <div class="achievement-card ${isUnlocked ? 'is-unlocked' : 'is-locked'}">
+            <span class="achievement-icon" aria-hidden="true">
+              ${isUnlocked
+                ? '<svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 8.5l3.5 3.5L13 4.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="square"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 16 16"><rect x="3.5" y="7" width="9" height="6.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>'
+              }
+            </span>
+            <span class="achievement-text">${isUnlocked ? a.label : a.desc}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const vscode = acquireVsCodeApi();
+
+    document.getElementById('show-all-btn').addEventListener('click', () => {
+      vscode.postMessage({ command: 'showAllAchievements' });
+    });
+
+    document.getElementById('pause-btn').addEventListener('click', () => {
+      vscode.postMessage({ command: 'pauseReminders' });
+    });
+
+    document.getElementById('resume-btn').addEventListener('click', () => {
+      vscode.postMessage({ command: 'resumeReminders' });
+    });
+
+    document.getElementById('set-btn').addEventListener('click', () => {
+      vscode.postMessage({ command: 'setInterval' });
+    });
+
+    // reflect whether reminders are currently running
+    function updateToolbarState(isRunning) {
+      document.getElementById('pause-btn').classList.toggle('is-active', isRunning);
+      document.getElementById('resume-btn').classList.toggle('is-active', !isRunning);
+    }
+
+    vscode.postMessage({ command: 'ready' });
+  </script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Press+Start+2P&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #121212;
+  --card-1:      #1a1a1a;
+  --card-2:      #1f1f1f;
+  --line:        #2a2a28;
+
+  /* one accent per meaning — never mixed */
+  --aqua:        #7fb8b0;   /* hydration */
+  --aqua-dim:    #4a6e69;
+  --amber:       #c9974f;   /* streak */
+  --amber-dim:   #6e5736;
+  --gold:        #d4b86a;   /* achievements */
+  --gold-dim:    #5c5034;
+  --teal:        #5a8a8a;   /* xp */
+  --teal-dim:    #2f4a4a;
+
+  --text:        #e8e4d8;
+  --text-soft:   #a39e8f;
+  --text-faint:  #635e52;
+
+  --r: 4px;
+  --shadow: 0 1px 0 rgba(0,0,0,0.4), 0 4px 10px -4px rgba(0,0,0,0.5);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 13px;
+  padding: 26px 20px 32px;
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header { margin-bottom: 22px; }
+
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 5px;
+}
+
+.header h1 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.header-sub {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  padding-left: 23px;
+}
+
+/* ── TOOLBAR: pause / resume / set ── */
+.toolbar {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card-1);
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.toolbar-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  color: var(--text-soft);
+  font-family: 'Inter', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 11px 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toolbar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.toolbar-btn:hover {
+  background: #222220;
+  color: var(--text);
+}
+
+.toolbar-btn:active {
+  background: #1b1b19;
+}
+
+.toolbar-btn.is-active {
+  color: var(--aqua);
+}
+
+.toolbar-btn:focus-visible {
+  outline: 1px solid var(--aqua);
+  outline-offset: -2px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  background: var(--line);
+  flex-shrink: 0;
+}
+
+/* ── PIXEL MOTIFS (no emoji, hand-cut shapes) ── */
+.motif, .corner-motif {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.motif-drop {
+  background-color: var(--aqua);
+  clip-path: polygon(50% 0%, 78% 38%, 88% 62%, 88% 76%, 72% 92%, 50% 100%, 28% 92%, 12% 76%, 12% 62%, 22% 38%);
+}
+
+.motif-flame {
+  background-color: var(--amber);
+  clip-path: polygon(50% 0%, 68% 22%, 80% 18%, 78% 42%, 92% 58%, 80% 88%, 50% 100%, 20% 88%, 8% 58%, 22% 42%, 20% 18%, 32% 22%);
+}
+
+.motif-star {
+  background-color: var(--teal);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.corner-motif {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 11px;
+  height: 11px;
+  opacity: 0.85;
+}
+
+/* ── DECORATIVE DIVIDER (tiny collectible dots) ── */
+.divider {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 18px 0;
+}
+
+.divider span {
+  width: 4px;
+  height: 4px;
+  background: var(--line);
+}
+
+.divider span:nth-child(2) {
+  background: var(--text-faint);
+}
+
+/* ── STATS GRID ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-card {
+  position: relative;
+  background: var(--card-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 18px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+}
+
+.stat-value {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 19px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-unit {
+  font-size: 11px;
+  color: var(--text-soft);
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.2px;
+}
+
+/* ── HERO XP CARD ── */
+.card {
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.card-hero {
+  background: linear-gradient(180deg, #1f221f 0%, #1a1c1a 100%);
+  border-color: var(--teal-dim);
+}
+
+.hero-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.hero-level {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.hero-xp {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* segmented RPG bar — crisp cut blocks, no gradient smear */
+.segment-bar {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.segment {
+  flex: 1;
+  height: 14px;
+  background: #0e0f0e;
+  border: 1px solid #2c2e2a;
+  border-radius: 1px;
+}
+
+.segment.filled {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.hero-caption {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* ── ACHIEVEMENTS ── */
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 13px;
+}
+
+.card-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10.5px;
+  color: var(--text);
+}
+
+.card-meta {
+  font-size: 10.5px;
+  color: var(--gold);
+}
+
+.achievement-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.achievement-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: #181816;
+}
+
+.achievement-card.is-unlocked {
+  border-color: var(--gold-dim);
+  background: #1d1a14;
+}
+
+.achievement-card.is-locked {
+  opacity: 0.55;
+}
+
+.achievement-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--gold);
+}
+
+.is-locked .achievement-icon {
+  color: var(--text-faint);
+}
+
+.achievement-text {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.is-locked .achievement-text {
+  color: var(--text-faint);
+}
+
+/* ── BUTTON ── */
+.btn-secondary {
+  width: 100%;
+  padding: 11px;
+  background: var(--card-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  color: var(--text-soft);
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--aqua-dim);
+  color: var(--text);
+}
+
+.btn-secondary:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.btn-secondary:focus-visible {
+  outline: 1px solid var(--aqua);
+  outline-offset: 2px;
+}
