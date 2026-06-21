@@ -141,28 +141,29 @@ function activate(context) {
     return progress;
   }
 
+  // --- reads from package.json's "hydrate.reminderInterval" / "hydrate.reminderMessage" ---
   function getIntervalMs() {
-    const config = vscode.workspace.getConfiguration("siptracker");
-    const minutes = config.get("sipInterval");
+    const config = vscode.workspace.getConfiguration("hydrate");
+    const minutes = config.get("reminderInterval");
     if (!minutes || minutes < 1) {
-      vscode.window.showWarningMessage("Sip Tracker: Invalid interval! Setting to 60 minutes.");
+      vscode.window.showWarningMessage("Hydrate: Invalid interval! Defaulting to 60 minutes.");
       return 60 * 60 * 1000;
     }
     return minutes * 60 * 1000;
   }
 
   function getIntervalMsg() {
-    const config = vscode.workspace.getConfiguration("siptracker");
-    const msg = config.get("sipMsg");
-    if (!msg || msg.trim() === "") return "Time to drink water!";
+    const config = vscode.workspace.getConfiguration("hydrate");
+    const msg = config.get("reminderMessage");
+    if (!msg || msg.trim() === "") return "Time to hydrate!";
     return msg;
   }
 
   // --- Status Bar ---
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
   statusBar.text = "$(clockface) --:--";
-  statusBar.tooltip = "Sip Tracker — click to open dashboard";
-  statusBar.command = "siptracker.showStats";
+  statusBar.tooltip = "Hydrate — click to open dashboard";
+  statusBar.command = "hydrate.showStats";
   statusBar.show();
 
   function updateStatusBar() {
@@ -178,10 +179,11 @@ function activate(context) {
 
   const countdownTick = setInterval(() => { updateStatusBar(); }, 1000);
 
+  // --- matches package.json's declared config keys exactly ---
   vscode.workspace.onDidChangeConfiguration((e) => {
     if (
-      e.affectsConfiguration("siptracker.sipInterval") ||
-      e.affectsConfiguration("siptracker.sipMsg")
+      e.affectsConfiguration("hydrate.reminderInterval") ||
+      e.affectsConfiguration("hydrate.reminderMessage")
     ) {
       stopInterval();
       startInterval();
@@ -285,7 +287,7 @@ function activate(context) {
       context.globalState.update("snoozedToday", false);
       sipCount = 0;
       context.globalState.update("sipCount", 0);
-      vscode.window.showInformationMessage("New day! Sip count reset.");
+      vscode.window.showInformationMessage("New day! Hydration count reset.");
       sendStatsToWebview();
       scheduleMidnightReset();
     }, msUntilMidnight);
@@ -342,7 +344,7 @@ function activate(context) {
   }
 
   const showStatsCommand = vscode.commands.registerCommand(
-    "siptracker.showStats",
+    "hydrate.showStats",
     function () {
       if (panel) {
         panel.reveal(vscode.ViewColumn.Two);
@@ -351,8 +353,8 @@ function activate(context) {
       }
 
       panel = vscode.window.createWebviewPanel(
-        "siptracker",
-        "Sip Tracker",
+        "hydrate",
+        "Hydrate",
         vscode.ViewColumn.Two,
         {
           enableScripts: true,
@@ -363,8 +365,8 @@ function activate(context) {
       panel.webview.html = getWebviewContent(panel.webview);
 
       panel.webview.onDidReceiveMessage((msg) => {
-        if (msg.command === "ready")                sendStatsToWebview();
-        if (msg.command === "showAllAchievements")  sendStatsToWebview(true);
+        if (msg.command === "ready")               sendStatsToWebview();
+        if (msg.command === "showAllAchievements") sendStatsToWebview(true);
         if (msg.command === "pauseReminders") {
           stopInterval();
           nextReminderAt = null;
@@ -377,7 +379,7 @@ function activate(context) {
           sendStatsToWebview();
         }
         if (msg.command === "setInterval") {
-          vscode.commands.executeCommand("workbench.action.openSettings", "siptracker.sipInterval");
+          vscode.commands.executeCommand("workbench.action.openSettings", "hydrate.reminderInterval");
         }
       });
 
@@ -389,30 +391,30 @@ function activate(context) {
   //  OTHER COMMANDS
   // ═══════════════════════════════════════════════════
 
-  const startCommand = vscode.commands.registerCommand("siptracker.start", function () {
+  const startCommand = vscode.commands.registerCommand("hydrate.start", function () {
     stopInterval();
     startInterval();
-    vscode.window.showInformationMessage("Reminder Started");
+    vscode.window.showInformationMessage("Hydrate: Reminders started");
     sendStatsToWebview();
   });
 
-  const stopCommand = vscode.commands.registerCommand("siptracker.stop", function () {
+  const stopCommand = vscode.commands.registerCommand("hydrate.stop", function () {
     stopInterval();
     nextReminderAt = null;
     updateStatusBar();
-    vscode.window.showInformationMessage("Reminder stopped");
+    vscode.window.showInformationMessage("Hydrate: Reminders stopped");
     sendStatsToWebview();
   });
 
-  const resetCommand = vscode.commands.registerCommand("siptracker.reset", function () {
+  const resetCommand = vscode.commands.registerCommand("hydrate.reset", function () {
     stopInterval();
     startInterval();
-    vscode.window.showInformationMessage("Reminder reset");
+    vscode.window.showInformationMessage("Hydrate: Timer reset");
     sendStatsToWebview();
   });
 
   const showAchievementsCommand = vscode.commands.registerCommand(
-    "siptracker.showAchievements",
+    "hydrate.showAchievements",
     function () {
       const items = ACHIEVEMENTS.map((a) => ({
         label: unlockedAchievements.has(a.id) ? a.label : `$(lock) ${a.desc}`,

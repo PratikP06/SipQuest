@@ -1,76 +1,99 @@
 {
-  "name": "siptracker",
-  "displayName": "Sip Tracker",
-  "description": "Hydration reminder and tracker for Visual Studio Code",
+  "name": "hydrate",
+  "displayName": "Hydrate",
+  "description": "Stay hydrated while coding. Receive smart reminders, earn XP, build streaks, unlock achievements, and level up your hydration habits.",
   "publisher": "pratik-pawar",
-  "version": "0.0.1",
+  "license": "MIT",
+  "version": "0.1.0",
   "icon": "icon.png",
+
   "engines": {
     "vscode": "^1.120.0"
   },
+
   "categories": [
     "Other"
   ],
+
+  "keywords": [
+    "water",
+    "hydration",
+    "health",
+    "productivity",
+    "reminder",
+    "wellness",
+    "gamification",
+    "xp",
+    "streak",
+    "achievements"
+  ],
+
   "activationEvents": [
     "onStartupFinished"
   ],
+
   "main": "./extension.js",
-  "files": [
-    "extension.js",
-    "webview.html",
-    "webview.css"
-  ],
+
   "contributes": {
     "commands": [
       {
-        "command": "siptracker.stop",
-        "title": "Sip Tracker: Stop Timer"
+        "command": "hydrate.start",
+        "title": "Hydrate: Start Timer"
       },
       {
-        "command": "siptracker.reset",
-        "title": "Sip Tracker: Reset Timer"
+        "command": "hydrate.stop",
+        "title": "Hydrate: Stop Timer"
       },
       {
-        "command": "siptracker.start",
-        "title": "Sip Tracker: Start Timer"
+        "command": "hydrate.reset",
+        "title": "Hydrate: Reset Timer"
       },
       {
-        "command": "siptracker.showStats",
-        "title": "Sip Tracker: Show Stats"
+        "command": "hydrate.showStats",
+        "title": "Hydrate: Show Stats"
       },
       {
-        "command": "siptracker.showAchievements",
-        "title": "Sip Tracker: Show Achievements"
+        "command": "hydrate.showAchievements",
+        "title": "Hydrate: Show Achievements"
       }
     ],
+
     "configuration": {
-      "title": "siptracker",
+      "title": "Hydrate",
       "properties": {
-        "siptracker.sipInterval": {
+        "hydrate.reminderInterval": {
           "type": "number",
-          "default": 0.25,
-          "min": 0,
+          "default": 60,
+          "minimum": 1,
           "description": "How often to remind you to drink water (in minutes)"
         },
-        "siptracker.sipMsg": {
+
+        "hydrate.reminderMessage": {
           "type": "string",
-          "default": "Time For a Sip!!",
-          "description": "Set your own reminder message"
+          "default": "Time to hydrate!",
+          "description": "Custom hydration reminder message"
         }
       }
     }
   },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PratikP06/Hydrate"
+  },
+
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test"
   },
+
   "devDependencies": {
     "@types/vscode": "^1.120.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
-    "eslint": "^9.39.3",
     "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.39.3"
   }
 }
