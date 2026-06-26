@@ -120,8 +120,8 @@ function activate(context) {
     context.globalState.update("lastActiveDate", today);
   }
 
-  function addXP() {
-    xp += XP_PER_SIP;
+  function addXP(xp = 10) {
+    xp += xp ?? XP_PER_SIP;
     context.globalState.update("xp", xp);
 
     if (xp >= xpForLevel(level)) {
