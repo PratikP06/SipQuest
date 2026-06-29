@@ -84,12 +84,17 @@ function activate(context) {
 
   function updateTimeOfDayTracking() {
     const hour = new Date().getHours();
+    if (hour < 6) {
+      addXP(5);
+    }
     if (hour < 9) {
       earlySipCount++;
+      addXP(3);
       context.globalState.update("earlySipCount", earlySipCount);
     }
     if (hour >= 22) {
       nightSipCount++;
+      addXP(6);
       context.globalState.update("nightSipCount", nightSipCount);
     }
   }
@@ -120,8 +125,8 @@ function activate(context) {
     context.globalState.update("lastActiveDate", today);
   }
 
-  function addXP() {
-    xp += XP_PER_SIP;
+  function addXP(xp = 10) {
+    xp += xp ?? XP_PER_SIP;
     context.globalState.update("xp", xp);
 
     if (xp >= xpForLevel(level)) {
@@ -225,6 +230,7 @@ function activate(context) {
             stopInterval();
 
             snoozedToday = true;
+            addXP(3);
             context.globalState.update("snoozedToday", true);
             totalSnoozes++;
             context.globalState.update("totalSnoozes", totalSnoozes);
@@ -278,6 +284,7 @@ function activate(context) {
           snoozeFreeStreak++;
         } else {
           snoozeFreeStreak = 0;
+          addXP(5);
         }
         context.globalState.update("snoozeFreeStreak", snoozeFreeStreak);
         checkAchievements();
